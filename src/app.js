@@ -1,13 +1,10 @@
-// src/app.js
 const express = require("express");
 const app = express();
 const { Restaurant } = require("../models/index");
 
-
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
-// GET all restaurants
 app.get("/restaurants", async (req, res) => {
   try {
     const restaurants = await Restaurant.findAll();
@@ -18,7 +15,6 @@ app.get("/restaurants", async (req, res) => {
   }
 });
 
-// GET restaurant by ID
 app.get("/restaurants/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -35,19 +31,22 @@ app.get("/restaurants/:id", async (req, res) => {
   }
 });
 
-app.post("/restaurants",async (req, res) => {
+app.post("/restaurants", async (req, res) => {
   const restaurant = await Restaurant.create(req.body);
-  res.json(restaurant);
+  const restaurants = await Restaurant.findAll();
+  res.json(restaurants);
 });
+
 app.put("/restaurants/:id", async (req, res) => {
-  const updatedRest = await Restaurant.update(req.body, {where: {id: req.params.id}});
-  res.json(updatedRest);
+  await Restaurant.update(req.body, { where: { id: req.params.id } });
+  const updated = await Restaurant.findByPk(req.params.id);
+  res.json(updated);
 });
-app.delete("/restaurants/:id", async (req, res) =>{
-  const deletedRest = await Restaurant.destroy({
-    where: { id: req.params.id },
-  });
-  res.json(deletedRest);
+
+app.delete("/restaurants/:id", async (req, res) => {
+  await Restaurant.destroy({ where: { id: req.params.id } });
+  const restaurants = await Restaurant.findAll();
+  res.json(restaurants);
 });
 
 module.exports = app;
